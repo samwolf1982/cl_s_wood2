@@ -1,0 +1,104 @@
+jQuery.noConflict();
+jQuery(document).ready(function($) {
+    setTimeout(function() {
+        console.log(Metrika);
+    }, 5000)
+    if (get('utm_campaign')) {
+        setCookie('cl_utm_campaign', get('utm_campaign'), 24*7);
+        setCookie('cl_utm_source', get('utm_source'), 24*7);
+        setCookie('cl_utm_content', get('utm_content'), 24*7);
+        setCookie('cl_utm_medium', get('utm_medium'), 24*7);
+        setCookie('cl_utm_term', get('utm_term'), 24*7);
+    }
+
+    $('.modal form, .big-form form, .wholesale form, form.slider-form, #headerForm').cl_sender();
+
+    $('.fancy').fancybox();
+
+    $('*[data-toggle="modal"]:not(".order-product")').click(function() {
+        if ($(this).data('title') !== undefined) {
+            $($(this).data('target')).find('form input[name=form-title]').val($(this).data('title'));
+            $($(this).data('target')).find('form input[name=goal]').val($(this).data('goal'));
+        }
+    });
+
+    $('form[name="form_finish"]').submit(function() {
+		
+        var links = [];
+
+        $(this).siblings('.jshop').find('tbody tr').each(function() {
+            if ($(this).find('a:first').attr('href') !== undefined) {
+                links.push($(this).find('a:first').attr('href'));
+            }
+        });
+
+        setCookie('products_links', JSON.stringify(links), 1);
+
+    })
+
+    $('.order-product').click(function(e) {
+        e.preventDefault();
+        var link = $(this).data('product');
+        var title = $(this).data('title');
+        var goal = 'order';
+        var Products = {
+            el: {},
+            getAttr: function(sel) {
+                return this.el.find(sel).text().trim()
+            }
+        }
+
+        var form = $($(this).data('target'));
+
+        $.get(link , function(data) {
+            Products.el = $(data).find('#component');
+            form.find('input[name="product-name"]').val(Products.getAttr('h2'));
+            form.find('input[name="product-price"]').val(Products.getAttr('.price .value .new-price').replace(/[^0-9]+/, ''));
+            form.find('input[name="product-article"]').val(Products.getAttr('.article'));
+            form.find('input[name="form-title"]').val(title);
+            form.find('input[name="product-link"]').val(link);
+            form.find('input[name="goal"]').val(goal);
+        });
+    })
+
+    $("input[name=phone]").mask('+7 (999) 999-99-99');
+    var mainSlider = $('.main-slider').bxSlider({
+         auto: true,
+         controls: false,
+         pager: false,
+         autoHover: true
+    });
+    $('form').on('keydown click keyup keypress focus', 'input', function() {
+        mainSlider.stopAuto();
+    });
+});
+
+setCookie = function(name, value, hours) {
+    var d = new Date();
+    d.setTime(d.getTime() + (hours*60*60*1000));
+    var expires = "expires="+d.toUTCString();
+    document.cookie = name + "=" + value + "; " + expires;
+};
+
+getCookie = function (name) {
+    var matches = document.cookie.match(new RegExp(
+        "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+    ));
+
+    return matches ? decodeURIComponent(matches[1]) : false;
+};
+
+function get(val) {
+    var result = false,
+        tmp = [];
+    location.search
+        //.replace ( "?", "" )
+        // this is better, there might be a question mark inside
+        .substr(1)
+        .split("&")
+        .forEach(function (item) {
+            tmp = item.split("=");
+            if (tmp[0] === val) result = decodeURIComponent(tmp[1]);
+        });
+    return result;
+}

@@ -1,0 +1,11 @@
+.ajaxloaddingcart{
+		background: url("../img/ajax-loader.gif"/*tpa=http://letdes.ru/modules/mod_jshopping_cart_ext_plus_ajax/img/ajax-loader.gif*/) no-repeat center transparent;
+		opacity:0.8;
+		height: 100%;
+		width: 64px;
+	      position:absolute;
+		top:15px;left:5px;
+		z-index: 9991;
+		}
+.redborder{border:1px dashed #ff0000;}
+.was_added_to_cart{display:inline-block;width:100%;color:#ff0000;font-size:10px;}
